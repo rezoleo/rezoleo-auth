@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rézoléo Inscription</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+    <img src="rezoleo_logo_light_mode.png" alt="Logo Rézoléo" class="logo">
+    <h1>Inscription à Rézoléo</h1>
+    <p>Entrez votre adresse email Centrale Lille, ainsi que votre numéro d'appartement si vous habitez à la Résidence
+        Léonard de Vinci.</p>
+
+    <form id="registrationForm">
+        <div class="form-group">
+            <label for="email">Adresse email étudiante</label>
+            <input type="email" id="email" name="email" required placeholder="prenom.nom@ecole.centralelille.fr">
+        </div>
+
+        <div class="form-group">
+            <label for="firstName">Prénom</label>
+            <input type="text" id="firstName" name="firstName" required placeholder="Prénom">
+        </div>
+
+        <div class="form-group">
+            <label for="lastName">Nom</label>
+            <input type="text" id="lastName" name="lastName" required placeholder="Nom">
+        </div>
+
+        <div class="form-group">
+            <label for="room">Appartement (optionnel)</label>
+            <input type="text" id="room" name="room" placeholder="Ex: A105B">
+        </div>
+
+        <button type="submit">S'inscrire</button>
+    </form>
+
+    <div id="error" class="error"></div>
+    <div id="success" class="success"></div>
+
+    <footer>
+        <a href="https://rezoleo.fr" target="_blank">↗ Rezoleo</a>
+    </footer>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

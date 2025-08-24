@@ -1,0 +1,89 @@
+services:
+  zitadel:
+    restart: unless-stopped
+    image: ghcr.io/zitadel/zitadel:v4.0.3
+    command: start-from-init --masterkeyFile /secrets/master.key --tlsMode external
+    environment:
+      ZITADEL_EXTERNALDOMAIN: sso.rezoleo.fr
+      ZITADEL_EXTERNALPORT: 443
+      ZITADEL_EXTERNALSECURE: false
+      ZITADEL_TLS_ENABLED: false
+      # Database
+      ZITADEL_DATABASE_POSTGRES_HOST: db
+      ZITADEL_DATABASE_POSTGRES_PORT: 5432
+      ZITADEL_DATABASE_POSTGRES_DATABASE: zitadel
+      ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel
+      ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: zitadel
+      ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
+      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: postgres
+      ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD: ${POSTGRES_ADMIN_PASSWORD}
+      ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE: disable
+      # Admin Account
+      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME: admin
+      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_FIRSTNAME: Admin
+      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_LASTNAME: Rézoléo
+      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD: ${ADMIN_ACCOUNT_PASSWORD}
+      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED: false
+      # Login UI
+      ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_REQUIRED: false
+
+    healthcheck:
+      test:
+      - CMD
+      - /app/zitadel
+      - ready
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 10s
+    volumes:
+      - ./master.key:/secrets/master.key:ro
+    ports:
+      - 8080:8080
+    networks:
+      - zitadel
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    restart: unless-stopped
+    image: postgres:17-alpine
+    environment:
+      PGUSER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD}
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - pg_isready
+      - -d
+      - zitadel
+      - -U
+      - postgres
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 20s
+    networks:
+      - zitadel
+    volumes:
+      - /srv/zitadel/postgres-data:/var/lib/postgresql/data
+
+  registration:
+    build:
+      context: ./registration-service
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      ZITADEL_BASE_URL: https://sso.rezoleo.fr
+      ZITADEL_ORGANIZATION_ID: 333641516377505795
+      ZITADEL_PAT: ${ZITADEL_REZOLEO_PAT}
+    ports:
+      - "8000:8000"
+    networks:
+      - zitadel
+    depends_on:
+      - zitadel
+
+networks:
+  zitadel:

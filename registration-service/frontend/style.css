@@ -1,0 +1,118 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+    background: url('image_cables.jpg') no-repeat center;
+    background-size: cover;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+}
+
+.container {
+    background: #fff;
+    padding: 2rem 2.5rem;
+    border-radius: 1.25rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+}
+
+.logo {
+    width: 50%;
+    height: 50%;
+}
+
+h1 {
+    font-size: 1.8rem;
+    margin-bottom: 0.75rem;
+    color: #2a5298;
+}
+
+p {
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+    color: #555;
+}
+
+.form-group {
+    margin-bottom: 1.2rem;
+    text-align: left;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #2a2a2a;
+}
+
+input {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    border: 2px solid #ddd;
+    border-radius: 0.6rem;
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input:focus {
+    border-color: #2a5298;
+    box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.2);
+    outline: none;
+}
+
+button {
+    width: 100%;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 0.6rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    background: #2a5298;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.1s;
+}
+
+button:hover {
+    background: #1e3c72;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+.error {
+    margin-top: 1rem;
+    color: #d9534f;
+    font-weight: 600;
+}
+
+.success {
+    margin-top: 1rem;
+    color: #28a745;
+    font-weight: 600;
+}
+
+footer {
+    margin-top: 2rem;
+}
+
+footer a {
+    color: #2a5298;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
