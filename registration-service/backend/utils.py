@@ -25,15 +25,12 @@ def titlecase_name(name: str) -> str:
 
 
 def sanitize_username_base(first: str, last: str) -> str:
-    # prenom.nom in lowercase, spaces -> underscore, other separators kept
     def norm(s: str) -> str:
         s = s.strip().lower()
-        s = s.replace(' ', '_')
-        # collapse invalid chars
-        s = re.sub(r"[^a-z0-9_\-]", "", s)
+        s = re.sub(r'[^a-z0-9]', '', s)
         return s
 
-    return f"{norm(first)}.{norm(last)}"
+    return f"{norm(first)}-{norm(last)}"[:31]
 
 
 def normalize_room(room: str) -> str:

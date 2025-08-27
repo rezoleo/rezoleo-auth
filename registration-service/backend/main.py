@@ -86,7 +86,7 @@ def register(req: RegisterRequest):
     first_title = titlecase_name(req.first_name)
     last_title = titlecase_name(req.last_name)
 
-    # 4) Generate username base: prenom.nom (lower, spaces->underscore)
+    # 4) Generate username base: firstname-lastname
     username_base = sanitize_username_base(first, last)
 
     # 5) Ensure uniqueness by checking Zitadel list users
