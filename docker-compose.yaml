@@ -85,5 +85,20 @@ services:
     depends_on:
       - zitadel
 
+  action-target:
+    build:
+      context: ./action-target
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      DISCORD_WEBHOOK_URL: ${DISCORD_WEBHOOK_URL}
+      ZITADEL_CONSOLE_URL: https://sso.rezoleo.fr/ui/console
+    ports:
+      - "8001:8001"
+    networks:
+      - zitadel
+    depends_on:
+      - zitadel
+
 networks:
   zitadel:
