@@ -1,6 +1,6 @@
 import base64
 
-import requests
+import httpx
 
 from .zitadel_schemas import *
 
@@ -9,7 +9,7 @@ class ZitadelConflict(Exception):
     pass
 
 
-def _user_exists(resp: requests.Response) -> bool:
+def _user_exists(resp: httpx.Response) -> bool:
     if resp.status_code == 401:
         raise RuntimeError("Zitadel auth failed – PAT invalide ou scope insuffisant")
     resp.raise_for_status()
@@ -27,26 +27,28 @@ class ZitadelClient:
             raise RuntimeError("ZITADEL_ORGANIZATION_ID manquant (variable d'environnement)")
 
         self.base_url = base_url.rstrip("/")
-        self.session = requests.Session()
-        self.session.headers.update({
-            "Authorization": f"Bearer {pat}",
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-        })
+        self.client = httpx.Client(
+            headers={
+                "Authorization": f"Bearer {pat}",
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            },
+            timeout=30.0
+        )
         self.organization_id = organization_id
 
     def email_exists(self, email: str) -> bool:
         url = f"{self.base_url}/v2/users"
         query = Query(emailQuery=EmailQuery(emailAddress=email))
         body = UserSearchRequest(queries=[query]).model_dump(mode="json", exclude_none=True)
-        resp = self.session.post(url, json=body)
+        resp = self.client.post(url, json=body)
         return _user_exists(resp)
 
     def username_exists(self, username: str) -> bool:
         url = f"{self.base_url}/v2/users"
         query = Query(userNameQuery=UsernameQuery(userName=username))
         body = UserSearchRequest(queries=[query]).model_dump(mode="json", exclude_none=True)
-        resp = self.session.post(url, json=body)
+        resp = self.client.post(url, json=body)
         return _user_exists(resp)
 
     def ensure_unique_username(self, base: str) -> str:
@@ -70,7 +72,7 @@ class ZitadelClient:
             ),
             email=UserEmail(email=email)
         ).model_dump(mode="json", exclude_none=True)
-        resp = self.session.post(url, json=body)
+        resp = self.client.post(url, json=body)
         if resp.status_code == 409:
             raise ZitadelConflict()
         if resp.status_code == 401:
@@ -84,5 +86,5 @@ class ZitadelClient:
         # For HTTP requests, values must be base64 encoded.
         meta_list = [MetadataEntry(key=k, value=base64.b64encode(v.encode()).decode()) for k, v in kv.items()]
         body = Metadata(metadata=meta_list).model_dump(mode="json", exclude_none=True)
-        resp = self.session.post(url, json=body)
+        resp = self.client.post(url, json=body)
         resp.raise_for_status()
