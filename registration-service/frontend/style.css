@@ -47,6 +47,30 @@ p {
     text-align: left;
 }
 
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.2rem;
+    text-align: left;
+    font-size: 0.85rem;
+}
+
+.checkbox-group a {
+    color: #2a5298;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+input[type="checkbox"] {
+    width: auto;
+    padding: 0;
+    border: initial;
+    border-radius: 0;
+    font-size: initial;
+    margin-right: 0.5rem;
+    cursor: pointer;
+}
+
 label {
     display: block;
     margin-bottom: 0.4rem;

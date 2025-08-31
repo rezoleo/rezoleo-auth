@@ -10,8 +10,7 @@
 <div class="container">
     <img src="rezoleo_logo_light_mode.png" alt="Logo Rézoléo" class="logo">
     <h1>Inscription à Rézoléo</h1>
-    <p>Entrez votre adresse email Centrale Lille, ainsi que votre numéro d'appartement si vous habitez à la Résidence
-        Léonard de Vinci.</p>
+    <p>Pour adhérer à Rézoléo, entrez votre adresse email Centrale, ainsi que votre appartement si vous habitez à la Rez.</p>
 
     <form id="registrationForm">
         <div class="form-group">
@@ -34,15 +33,23 @@
             <input type="text" id="room" name="room" placeholder="Ex: A105B">
         </div>
 
+        <div class="form-group checkbox-group">
+            <label>
+                <input type="checkbox" id="terms" required>
+                <span>
+                    J'ai lu et j'accepte le
+                    <a href="https://ri.rezoleo.fr" target="_blank">règlement intérieur</a>
+                    de Rézoléo, ainsi que la
+                    <a href="https://rezoleo.fr" target="_blank">politique de confidentialité</a>.
+                </span>
+            </label>
+        </div>
+
         <button type="submit">S'inscrire</button>
     </form>
 
     <div id="error" class="error"></div>
     <div id="success" class="success"></div>
-
-    <footer>
-        <a href="https://rezoleo.fr" target="_blank">↗ Rezoleo</a>
-    </footer>
 </div>
 <script src="script.js"></script>
 </body>
