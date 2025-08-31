@@ -3,7 +3,12 @@ import os
 from typing import Any
 
 import httpx
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+)
 
 app = FastAPI()
 
@@ -48,5 +53,16 @@ async def new_user(payload: dict[str, Any]):
 
     async with httpx.AsyncClient() as client:
         await client.post(DISCORD_WEBHOOK_URL, json=message)
+
+    return {"status": "ok"}
+
+
+@app.post("/on-user-updated")
+async def update_user(payload: dict[str, Any]):
+    logging.info(f"User updated: {payload}")
+
+    # a user cannot change their own username
+    if payload["userID"] == payload["request"]["userId"] and "username" in payload["request"]:
+        raise HTTPException(status_code=403, detail="Username change not allowed")
 
     return {"status": "ok"}
