@@ -1,7 +1,8 @@
 import re
 
-EMAIL_RE = re.compile(r"^([a-zA-Z_-]+)\.([a-zA-Z0-9_-]+)@(centrale|enscl|iteem|ig2i)\.centralelille\.fr$",
-                      re.IGNORECASE)
+EMAIL_RE = re.compile(
+    r"^(?P<first>[a-zA-Z_-]+)\.(?P<last>[a-zA-Z0-9_-]+)@(?P<school>centrale|enscl|iteem|ig2i)\.centralelille\.fr$"
+)
 
 NAME_TOKEN_RE = re.compile(r"([a-zA-ZÀ-ÖØ-öø-ÿ]+)")
 
@@ -10,7 +11,7 @@ def parse_school_email(email: str):
     m = EMAIL_RE.match(email.strip())
     if not m:
         raise ValueError("Email invalide. Format attendu: prenom.nom@ecole.centralelille.fr")
-    first, last, school = m.group(1), m.group(2), m.group(3)
+    first, last, school = m.group("first"), m.group("last"), m.group("school")
     return first, last, school
 
 
