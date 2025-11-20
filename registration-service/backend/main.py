@@ -8,8 +8,6 @@ from pydantic import BaseModel
 from .utils import (
     parse_school_email,
     titlecase_name,
-    normalize_room,
-    load_rooms,
     sanitize_username_base,
 )
 from .zitadel_client import ZitadelClient, ZitadelConflict
@@ -19,7 +17,6 @@ class RegisterRequest(BaseModel):
     email: str
     first_name: str
     last_name: str
-    room: str | None = None
 
 
 class RegisterResponse(BaseModel):
@@ -29,7 +26,6 @@ class RegisterResponse(BaseModel):
     first_name: str
     last_name: str
     school: str
-    room: str | None
 
 
 app = FastAPI(title="registration-service")
@@ -43,9 +39,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-ROOMS_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "rooms.txt")
-ROOMS = load_rooms(ROOMS_PATH)
-
 zitadel = ZitadelClient(
     base_url=os.getenv("ZITADEL_BASE_URL"),
     pat=os.getenv("ZITADEL_PAT"),
@@ -56,11 +49,6 @@ zitadel = ZitadelClient(
 @app.get("/health")
 def health():
     return {"status": "ok"}
-
-
-@app.get("/rooms", response_model=list[str])
-def list_rooms():
-    return ROOMS
 
 
 @app.post("/register", response_model=RegisterResponse)
@@ -75,24 +63,17 @@ def register(req: RegisterRequest):
         raise HTTPException(status_code=409,
                             detail="Le compte associé à cet email existe déjà. Contactez Rézoléo si vous pensez qu'il s'agit d'une erreur.")
 
-    # 2) Normalize optional room
-    room_norm = None
-    if req.room:
-        room_norm = normalize_room(req.room)
-        if room_norm not in ROOMS:
-            raise HTTPException(status_code=400, detail="La chambre n'est pas reconnue dans la résidence.")
-
-    # 3) Capitalize names (Jean-paul -> Jean-Paul)
+    # 2) Capitalize names (Jean-paul -> Jean-Paul)
     first_title = titlecase_name(req.first_name)
     last_title = titlecase_name(req.last_name)
 
-    # 4) Generate username base: firstname-lastname
+    # 3) Generate username base: firstname-lastname
     username_base = sanitize_username_base(first, last)
 
-    # 5) Ensure uniqueness by checking Zitadel list users
+    # 4) Ensure uniqueness by checking Zitadel list users
     username = zitadel.ensure_unique_username(username_base)
 
-    # 6) Create user in Zitadel
+    # 5) Create user in Zitadel
     try:
         user_id = zitadel.create_human_user(
             username=username,
@@ -103,11 +84,8 @@ def register(req: RegisterRequest):
     except ZitadelConflict:
         raise HTTPException(status_code=409, detail="Une erreur est survenue. Merci de réessayer.")
 
-    # 7) Set metadata: school (lowercase), room (if any)
-    meta = {"school": school.lower()}
-    if room_norm:
-        meta["room"] = room_norm
-    zitadel.set_user_metadata(user_id, meta)
+    # 6) Set metadata: school (lowercase)
+    zitadel.set_user_metadata(user_id, {"school": school.lower()})
 
     return RegisterResponse(
         user_id=user_id,
@@ -116,7 +94,6 @@ def register(req: RegisterRequest):
         first_name=first_title,
         last_name=last_title,
         school=school.lower(),
-        room=room_norm,
     )
 
 

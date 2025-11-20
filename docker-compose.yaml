@@ -1,7 +1,7 @@
 services:
   zitadel:
     restart: unless-stopped
-    image: ghcr.io/zitadel/zitadel:v4.0.3
+    image: ghcr.io/zitadel/zitadel:v4.6.6
     command: start-from-init --masterkeyFile /secrets/master.key --tlsMode external
     environment:
       ZITADEL_EXTERNALDOMAIN: sso.rezoleo.fr
@@ -9,7 +9,7 @@ services:
       ZITADEL_EXTERNALSECURE: false
       ZITADEL_TLS_ENABLED: false
       # Database
-      ZITADEL_DATABASE_POSTGRES_HOST: db
+      ZITADEL_DATABASE_POSTGRES_HOST: host.docker.internal
       ZITADEL_DATABASE_POSTGRES_PORT: 5432
       ZITADEL_DATABASE_POSTGRES_DATABASE: zitadel
       ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel
@@ -42,32 +42,8 @@ services:
       - 8080:8080
     networks:
       - zitadel
-    depends_on:
-      db:
-        condition: service_healthy
-
-  db:
-    restart: unless-stopped
-    image: postgres:17-alpine
-    environment:
-      PGUSER: postgres
-      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD}
-    healthcheck:
-      test:
-      - CMD-SHELL
-      - pg_isready
-      - -d
-      - zitadel
-      - -U
-      - postgres
-      interval: 10s
-      timeout: 30s
-      retries: 5
-      start_period: 20s
-    networks:
-      - zitadel
-    volumes:
-      - /srv/zitadel/postgres-data:/var/lib/postgresql/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   registration:
     build:

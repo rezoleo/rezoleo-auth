@@ -2,7 +2,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const emailInput = document.getElementById("email");
     const firstNameInput = document.getElementById("firstName");
     const lastNameInput = document.getElementById("lastName");
-    const roomInput = document.getElementById("room");
     const errorDiv = document.getElementById("error");
     const successDiv = document.getElementById("success");
     const form = document.getElementById("registrationForm");
@@ -29,10 +28,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
     }
 
-    function normalizeRoom(value) {
-        return value ? value.toUpperCase() : "";
-    }
-
     emailInput.addEventListener("input", () => {
         if (!validateEmail(emailInput.value)) {
             emailInput.style.borderColor = "red";
@@ -47,10 +42,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    roomInput.addEventListener("input", () => {
-        roomInput.value = normalizeRoom(roomInput.value);
-    });
-
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
         errorDiv.textContent = "";
@@ -60,7 +51,6 @@ document.addEventListener("DOMContentLoaded", () => {
             email: emailInput.value,
             first_name: firstNameInput.value,
             last_name: lastNameInput.value,
-            room: roomInput.value || null,
         };
 
         const resp = await fetch("/register", {

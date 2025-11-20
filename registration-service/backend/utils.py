@@ -32,16 +32,3 @@ def sanitize_username_base(first: str, last: str) -> str:
         return s
 
     return f"{norm(first)}-{norm(last)}"[:31]
-
-
-def normalize_room(room: str) -> str:
-    return room.strip().upper()
-
-
-def load_rooms(path: str) -> list[str]:
-    try:
-        with open(path, 'r', encoding='utf-8') as f:
-            rooms = [normalize_room(line) for line in f if line.strip()]
-        return rooms
-    except FileNotFoundError:
-        return []
