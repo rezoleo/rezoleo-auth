@@ -16,6 +16,13 @@ DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
 ZITADEL_CONSOLE_URL = os.getenv("ZITADEL_CONSOLE_URL")
 
 
+def forward_error(status_code: int, message: str) -> dict[str, Any]:
+    return {
+        "forwardedStatusCode": status_code,
+        "forwardedErrorMessage": message,
+    }
+
+
 @app.post("/on-user-created")
 async def new_user(payload: dict[str, Any]):
     logging.info(f"New user created: {payload}")
@@ -61,9 +68,11 @@ async def new_user(payload: dict[str, Any]):
 async def update_user(payload: dict[str, Any]):
     logging.info(f"User updated: {payload}")
 
-    # a user cannot change their own username
-    if payload["userID"] == payload["request"]["userId"] and "username" in payload["request"]:
-        raise HTTPException(status_code=403, detail="Username change not allowed")
+    is_username_change = "username" in payload["request"]
+    is_admin_action = payload["userID"] != payload["request"]["userId"]
+
+    if is_username_change and not is_admin_action:
+        return forward_error(403, "Username change not allowed")
 
     return {"status": "ok"}
 
