@@ -66,3 +66,18 @@ async def update_user(payload: dict[str, Any]):
         raise HTTPException(status_code=403, detail="Username change not allowed")
 
     return {"status": "ok"}
+
+
+@app.post("/on-userinfo")
+async def userinfo(payload: dict[str, Any]):
+    logging.debug(f"Userinfo requested: {payload}")
+
+    # add roles to the userinfo claims based on user grants
+    # each grant becomes a claim "roles-<project_name>" with the list of roles
+    # e.g. "roles-REZOLEO": ["admin", "rezoleo"]
+    append_claims = [
+        {"key": f"roles-{grant['project_name']}", "value": grant["roles"]}
+        for grant in payload.get("user_grants", [])
+    ]
+
+    return {"append_claims": append_claims}
