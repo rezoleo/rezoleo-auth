@@ -1,9 +1,10 @@
 import logging
 import os
+import re
 from typing import Any
 
 import httpx
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 
 logging.basicConfig(
     level=logging.INFO,
@@ -21,6 +22,10 @@ def forward_error(status_code: int, message: str) -> dict[str, Any]:
         "forwardedStatusCode": status_code,
         "forwardedErrorMessage": message,
     }
+
+
+def is_valid_username(username: str) -> bool:
+    return re.match(r"^[a-z][a-z0-9_-]{0,30}$", username) is not None
 
 
 @app.post("/on-user-created")
@@ -73,6 +78,9 @@ async def update_user(payload: dict[str, Any]):
 
     if is_username_change and not is_admin_action:
         return forward_error(403, "Username change not allowed")
+
+    if is_username_change and not is_valid_username(payload["request"]["username"]):
+        return forward_error(400, "Username must be a valid unix-like username")
 
     return {"status": "ok"}
 
