@@ -42,17 +42,18 @@ class UserEmail(BaseModel):
     isVerified: bool | None = None
 
 
-class UserCreateRequest(BaseModel):
-    organizationId: str
-    username: str
-    profile: UserProfile
-    email: UserEmail
-
-
 class MetadataEntry(BaseModel):
     key: str
     value: str
 
 
-class Metadata(BaseModel):
+class HumanCreateRequest(BaseModel):
+    profile: UserProfile
+    email: UserEmail
     metadata: list[MetadataEntry]
+
+
+class UserCreateRequest(BaseModel):
+    organizationId: str
+    username: str
+    human: HumanCreateRequest

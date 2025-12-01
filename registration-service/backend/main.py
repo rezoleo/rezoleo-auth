@@ -80,12 +80,10 @@ def register(req: RegisterRequest):
             email=req.email,
             given_name=first_title,
             family_name=last_title,
+            school=school.lower(),
         )
     except ZitadelConflict:
         raise HTTPException(status_code=409, detail="Une erreur est survenue. Merci de réessayer.")
-
-    # 6) Set metadata: school (lowercase)
-    zitadel.set_user_metadata(user_id, {"school": school.lower()})
 
     return RegisterResponse(
         user_id=user_id,

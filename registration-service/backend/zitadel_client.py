@@ -17,6 +17,10 @@ def _user_exists(resp: httpx.Response) -> bool:
     return len(users) > 0
 
 
+def _encode_metadata_value(value: str) -> str:
+    return base64.b64encode(value.encode()).decode()
+
+
 class ZitadelClient:
     def __init__(self, base_url: str, pat: str, organization_id: str):
         if not base_url:
@@ -59,18 +63,21 @@ class ZitadelClient:
             i += 1
         return candidate
 
-    def create_human_user(self, username: str, email: str, given_name: str, family_name: str) -> str:
-        url = f"{self.base_url}/v2/users/human"
+    def create_human_user(self, username: str, email: str, given_name: str, family_name: str, school: str) -> str:
+        url = f"{self.base_url}/v2/users/new"
         body = UserCreateRequest(
             organizationId=self.organization_id,
             username=username,
-            profile=UserProfile(
-                givenName=given_name,
-                familyName=family_name,
-                displayName=f"{given_name} {family_name}",
-                # preferredLanguage="fr",
-            ),
-            email=UserEmail(email=email)
+            human=HumanCreateRequest(
+                profile=UserProfile(
+                    givenName=given_name,
+                    familyName=family_name,
+                    displayName=f"{given_name} {family_name}",
+                    # preferredLanguage="fr",
+                ),
+                email=UserEmail(email=email),
+                metadata=[MetadataEntry(key="school", value=_encode_metadata_value(school))],
+            )
         ).model_dump(mode="json", exclude_none=True)
         resp = self.client.post(url, json=body)
         if resp.status_code == 409:
@@ -79,12 +86,4 @@ class ZitadelClient:
             raise RuntimeError("Zitadel auth failed – PAT invalide ou scope insuffisant")
         resp.raise_for_status()
         data = resp.json()
-        return data.get("userId") or data.get("user_id") or data.get("id")
-
-    def set_user_metadata(self, user_id: str, kv: dict[str, str]):
-        url = f"{self.base_url}/v2/users/{user_id}/metadata"
-        # For HTTP requests, values must be base64 encoded.
-        meta_list = [MetadataEntry(key=k, value=base64.b64encode(v.encode()).decode()) for k, v in kv.items()]
-        body = Metadata(metadata=meta_list).model_dump(mode="json", exclude_none=True)
-        resp = self.client.post(url, json=body)
-        resp.raise_for_status()
+        return data.get("id") or ""
