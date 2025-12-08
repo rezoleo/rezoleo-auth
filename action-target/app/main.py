@@ -32,8 +32,9 @@ def is_valid_username(username: str) -> bool:
 async def new_user(payload: dict[str, Any]):
     logging.info(f"New user created: {payload}")
 
-    user_id = payload["response"]["userId"]
-    organization_id = payload["response"]["resourceOwner"]
+    user_id = payload["response"]["id"]
+    full_method = payload["fullMethod"]
+    organization_id = payload["orgID"]
 
     message = {
         "embeds": [
@@ -43,18 +44,18 @@ async def new_user(payload: dict[str, Any]):
                 "fields": [
                     {
                         "id": 131734505,
-                        "name": "Identifiant",
+                        "name": "Id",
                         "value": f"{user_id}",
                         "inline": True
                     },
                     {
                         "id": 803754614,
-                        "name": "Organisation",
+                        "name": "Org Id",
                         "value": f"{organization_id}",
                         "inline": True
                     }
                 ],
-                "title": "🙋‍♂️ Un nouvel utilisateur a été crée sur le SSO",
+                "title": full_method,
                 "footer": {
                     "text": "nyx@rezoleo.fr"
                 },
