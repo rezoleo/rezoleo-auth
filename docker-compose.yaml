@@ -1,22 +1,22 @@
 services:
   zitadel:
     restart: unless-stopped
-    image: ghcr.io/zitadel/zitadel:v4.6.6
-    command: start-from-init --masterkeyFile /secrets/master.key --tlsMode external
+    image: ghcr.io/zitadel/zitadel:v4.9.1
+    # command: start-from-init --masterkeyFile /secrets/master.key --tlsMode external
+    # command: start-from-setup --masterkeyFile /secrets/master.key --tlsMode external
+    command: start --masterkeyFile /secrets/master.key --tlsMode external
     environment:
       ZITADEL_EXTERNALDOMAIN: sso.rezoleo.fr
       ZITADEL_EXTERNALPORT: 443
       ZITADEL_EXTERNALSECURE: false
       ZITADEL_TLS_ENABLED: false
       # Database
-      ZITADEL_DATABASE_POSTGRES_HOST: host.docker.internal
+      ZITADEL_DATABASE_POSTGRES_HOST: pg.rezoleo.fr
       ZITADEL_DATABASE_POSTGRES_PORT: 5432
       ZITADEL_DATABASE_POSTGRES_DATABASE: zitadel
       ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel
-      ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: zitadel
+      ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: ${POSTGRES_PASSWORD}
       ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
-      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: postgres
-      ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD: ${POSTGRES_ADMIN_PASSWORD}
       ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE: disable
       # Admin Account
       ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME: admin
@@ -42,8 +42,6 @@ services:
       - 8080:8080
     networks:
       - zitadel
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
 
   registration:
     build:
@@ -52,7 +50,7 @@ services:
     restart: unless-stopped
     environment:
       ZITADEL_BASE_URL: https://sso.rezoleo.fr
-      ZITADEL_ORGANIZATION_ID: 333641516377505795
+      ZITADEL_ORGANIZATION_ID: 333665636326637571
       ZITADEL_PAT: ${ZITADEL_REZOLEO_PAT}
     ports:
       - "8000:8000"
@@ -75,6 +73,7 @@ services:
       - zitadel
     depends_on:
       - zitadel
+
 
 networks:
   zitadel:

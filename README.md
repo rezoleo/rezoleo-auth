@@ -25,7 +25,7 @@ graph LR
         AT --> Z
     end
     AT -.-> DC[Discord]
-    Z -.-> DB[(Postgresql)]
+    Z -.-> DB[(pg.rezoleo.fr)]
     SR --> RS
 ```
 
