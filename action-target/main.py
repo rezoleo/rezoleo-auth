@@ -46,26 +46,25 @@ async def new_user(payload: dict[str, Any]):
                         "id": 131734505,
                         "name": "Id",
                         "value": f"{user_id}",
-                        "inline": True
+                        "inline": True,
                     },
                     {
                         "id": 803754614,
                         "name": "Org Id",
                         "value": f"{organization_id}",
-                        "inline": True
-                    }
+                        "inline": True,
+                    },
                 ],
                 "title": full_method,
-                "footer": {
-                    "text": "nyx@rezoleo.fr"
-                },
-                "color": 15601
+                "footer": {"text": "nyx@rezoleo.fr"},
+                "color": 15601,
             }
         ]
     }
 
-    async with httpx.AsyncClient() as client:
-        await client.post(DISCORD_WEBHOOK_URL, json=message)
+    if DISCORD_WEBHOOK_URL:
+        async with httpx.AsyncClient() as client:
+            await client.post(DISCORD_WEBHOOK_URL, json=message)
 
     return {"status": "ok"}
 

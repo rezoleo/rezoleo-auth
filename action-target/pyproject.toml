@@ -1,0 +1,15 @@
+[project]
+name = "action-target"
+author = "David Marembert"
+version = "0.1.0"
+description = "Zitadel Action Target"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi[standard]>=0.129.0",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.2",
+    "ty>=0.0.17",
+]

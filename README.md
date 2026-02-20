@@ -130,18 +130,14 @@ Services:
 
 ```bash
 cd registration-service
-uv venv --python 3.13 && source .venv/bin/activate
-uv pip install -r requirements.txt
-uvicorn backend.main:app --reload --port 8000
+uv run uvicorn backend.main:app --reload --port 8000
 ```
 
 **Action target:**
 
 ```bash
 cd action-target
-uv venv --python 3.13 && source .venv/bin/activate
-uv pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8001
+uv run uvicorn main:app --reload --port 8001
 ```
 
 ## Zitadel Integration

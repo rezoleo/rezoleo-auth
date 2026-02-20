@@ -32,7 +32,7 @@ app = FastAPI(title="registration-service")
 
 # CORS for local dev/front hosting
 app.add_middleware(
-    CORSMiddleware,
+    CORSMiddleware,  # ty: ignore[invalid-argument-type]
     allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
@@ -40,9 +40,9 @@ app.add_middleware(
 )
 
 zitadel = ZitadelClient(
-    base_url=os.getenv("ZITADEL_BASE_URL"),
-    pat=os.getenv("ZITADEL_PAT"),
-    organization_id=os.getenv("ZITADEL_ORGANIZATION_ID")
+    base_url=os.getenv("ZITADEL_BASE_URL") or "NOT_SET",
+    pat=os.getenv("ZITADEL_PAT") or "NOT_SET",
+    organization_id=os.getenv("ZITADEL_ORGANIZATION_ID") or "NOT_SET",
 )
 
 
@@ -60,8 +60,10 @@ def register(req: RegisterRequest):
         raise HTTPException(status_code=400, detail=str(e))
 
     if zitadel.email_exists(req.email):
-        raise HTTPException(status_code=409,
-                            detail="Le compte associé à cet email existe déjà. Contactez Rézoléo si vous pensez qu'il s'agit d'une erreur.")
+        raise HTTPException(
+            status_code=409,
+            detail="Le compte associé à cet email existe déjà. Contactez Rézoléo si vous pensez qu'il s'agit d'une erreur.",
+        )
 
     # 2) Capitalize names (Jean-paul -> Jean-Paul)
     first_title = titlecase_name(req.first_name)
@@ -83,7 +85,9 @@ def register(req: RegisterRequest):
             school=school.lower(),
         )
     except ZitadelConflict:
-        raise HTTPException(status_code=409, detail="Une erreur est survenue. Merci de réessayer.")
+        raise HTTPException(
+            status_code=409, detail="Une erreur est survenue. Merci de réessayer."
+        )
 
     return RegisterResponse(
         user_id=user_id,
@@ -95,6 +99,6 @@ def register(req: RegisterRequest):
     )
 
 
-# Serve the static frontend
+# Serve the static frontend on the root path.
 frontend_dir = os.path.join(os.path.dirname(__file__), "..", "frontend")
 app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="static")

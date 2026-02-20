@@ -10,7 +10,9 @@ NAME_TOKEN_RE = re.compile(r"([a-zA-ZÀ-ÖØ-öø-ÿ]+)")
 def parse_school_email(email: str):
     m = EMAIL_RE.match(email.strip())
     if not m:
-        raise ValueError("Email invalide. Format attendu: prenom.nom@ecole.centralelille.fr")
+        raise ValueError(
+            "Email invalide. Format attendu: prenom.nom@ecole.centralelille.fr"
+        )
     first, last, school = m.group("first"), m.group("last"), m.group("school")
     return first, last, school
 
@@ -22,13 +24,13 @@ def titlecase_name(name: str) -> str:
     def tc(token: str) -> str:
         return token[:1].upper() + token[1:].lower() if token else token
 
-    return ''.join(tc(p) if NAME_TOKEN_RE.match(p) else p for p in parts)
+    return "".join(tc(p) if NAME_TOKEN_RE.match(p) else p for p in parts)
 
 
 def sanitize_username_base(first: str, last: str) -> str:
     def norm(s: str) -> str:
         s = s.strip().lower()
-        s = re.sub(r'[^a-z0-9]', '', s)
+        s = re.sub(r"[^a-z0-9]", "", s)
         return s
 
     return f"{norm(first)}-{norm(last)}"[:31]

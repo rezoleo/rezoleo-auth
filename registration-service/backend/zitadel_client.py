@@ -2,7 +2,17 @@ import base64
 
 import httpx
 
-from .zitadel_schemas import *
+from .zitadel_schemas import (
+    EmailQuery,
+    HumanCreateRequest,
+    MetadataEntry,
+    Query,
+    UserCreateRequest,
+    UserEmail,
+    UserProfile,
+    UserSearchRequest,
+    UsernameQuery,
+)
 
 
 class ZitadelConflict(Exception):
@@ -28,7 +38,9 @@ class ZitadelClient:
         if not pat:
             raise RuntimeError("ZITADEL_PAT manquant (variable d'environnement)")
         if not organization_id:
-            raise RuntimeError("ZITADEL_ORGANIZATION_ID manquant (variable d'environnement)")
+            raise RuntimeError(
+                "ZITADEL_ORGANIZATION_ID manquant (variable d'environnement)"
+            )
 
         self.base_url = base_url.rstrip("/")
         self.client = httpx.Client(
@@ -37,21 +49,25 @@ class ZitadelClient:
                 "Content-Type": "application/json",
                 "Accept": "application/json",
             },
-            timeout=30.0
+            timeout=30.0,
         )
         self.organization_id = organization_id
 
     def email_exists(self, email: str) -> bool:
         url = f"{self.base_url}/v2/users"
         query = Query(emailQuery=EmailQuery(emailAddress=email))
-        body = UserSearchRequest(queries=[query]).model_dump(mode="json", exclude_none=True)
+        body = UserSearchRequest(queries=[query]).model_dump(
+            mode="json", exclude_none=True
+        )
         resp = self.client.post(url, json=body)
         return _user_exists(resp)
 
     def username_exists(self, username: str) -> bool:
         url = f"{self.base_url}/v2/users"
         query = Query(userNameQuery=UsernameQuery(userName=username))
-        body = UserSearchRequest(queries=[query]).model_dump(mode="json", exclude_none=True)
+        body = UserSearchRequest(queries=[query]).model_dump(
+            mode="json", exclude_none=True
+        )
         resp = self.client.post(url, json=body)
         return _user_exists(resp)
 
@@ -63,7 +79,9 @@ class ZitadelClient:
             i += 1
         return candidate
 
-    def create_human_user(self, username: str, email: str, given_name: str, family_name: str, school: str) -> str:
+    def create_human_user(
+        self, username: str, email: str, given_name: str, family_name: str, school: str
+    ) -> str:
         url = f"{self.base_url}/v2/users/new"
         body = UserCreateRequest(
             organizationId=self.organization_id,
@@ -76,14 +94,18 @@ class ZitadelClient:
                     # preferredLanguage="fr",
                 ),
                 email=UserEmail(email=email),
-                metadata=[MetadataEntry(key="school", value=_encode_metadata_value(school))],
-            )
+                metadata=[
+                    MetadataEntry(key="school", value=_encode_metadata_value(school))
+                ],
+            ),
         ).model_dump(mode="json", exclude_none=True)
         resp = self.client.post(url, json=body)
         if resp.status_code == 409:
             raise ZitadelConflict()
         if resp.status_code == 401:
-            raise RuntimeError("Zitadel auth failed – PAT invalide ou scope insuffisant")
+            raise RuntimeError(
+                "Zitadel auth failed – PAT invalide ou scope insuffisant"
+            )
         resp.raise_for_status()
         data = resp.json()
         return data.get("id") or ""

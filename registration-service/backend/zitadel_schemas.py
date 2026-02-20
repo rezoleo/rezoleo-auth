@@ -11,12 +11,16 @@ class QueryMeta(BaseModel):
 
 class EmailQuery(BaseModel):
     emailAddress: str
-    method: Literal["TEXT_QUERY_METHOD_EQUALS", "TEXT_QUERY_METHOD_CONTAINS"] = "TEXT_QUERY_METHOD_EQUALS"
+    method: Literal["TEXT_QUERY_METHOD_EQUALS", "TEXT_QUERY_METHOD_CONTAINS"] = (
+        "TEXT_QUERY_METHOD_EQUALS"
+    )
 
 
 class UsernameQuery(BaseModel):
     userName: str
-    method: Literal["TEXT_QUERY_METHOD_EQUALS", "TEXT_QUERY_METHOD_CONTAINS"] = "TEXT_QUERY_METHOD_EQUALS"
+    method: Literal["TEXT_QUERY_METHOD_EQUALS", "TEXT_QUERY_METHOD_CONTAINS"] = (
+        "TEXT_QUERY_METHOD_EQUALS"
+    )
 
 
 class Query(BaseModel):
