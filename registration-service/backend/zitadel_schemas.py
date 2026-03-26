@@ -54,10 +54,10 @@ class MetadataEntry(BaseModel):
 class HumanCreateRequest(BaseModel):
     profile: UserProfile
     email: UserEmail
-    metadata: list[MetadataEntry]
 
 
 class UserCreateRequest(BaseModel):
     organizationId: str
     username: str
     human: HumanCreateRequest
+    metadata: list[MetadataEntry]

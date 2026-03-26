@@ -94,10 +94,10 @@ class ZitadelClient:
                     # preferredLanguage="fr",
                 ),
                 email=UserEmail(email=email),
-                metadata=[
-                    MetadataEntry(key="school", value=_encode_metadata_value(school))
-                ],
             ),
+            metadata=[
+                MetadataEntry(key="school", value=_encode_metadata_value(school))
+            ],
         ).model_dump(mode="json", exclude_none=True)
         resp = self.client.post(url, json=body)
         if resp.status_code == 409:

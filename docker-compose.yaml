@@ -1,7 +1,7 @@
 services:
   zitadel:
     restart: unless-stopped
-    image: ghcr.io/zitadel/zitadel:v4.11.0
+    image: ghcr.io/zitadel/zitadel:v4.13.0
     # command: start-from-init --masterkeyFile /secrets/master.key --tlsMode external
     # command: start-from-setup --masterkeyFile /secrets/master.key --tlsMode external
     command: start --masterkeyFile /secrets/master.key --tlsMode external
